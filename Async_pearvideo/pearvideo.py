@@ -13,6 +13,7 @@ sem = asyncio.Semaphore(100)
 
 class Spider(object):
     def __init__(self):
+        self.contIds_seen = set()
         self.page_url = "http://app.pearvideo.com/clt/jsp/v4/content.jsp"
         self.baseurl = "http://app.pearvideo.com/clt/jsp/v4/getCategoryConts.jsp?categoryId={cid}&hotPageidx=1"
         self.cids = [10, 1, 2, 9, 5, 8, 4, 3, 31, 6, 59]
@@ -51,11 +52,19 @@ class Spider(object):
                         if hotList:
                             for hot in hotList:
                                 contId = hot.get('contId')
-                                await self.request_url(contId, session)
+                                if contId not in self.contIds_seen:
+                                    self.contIds_seen.add(contId)
+                                    await self.request_url(contId, session)
+                                else:
+                                    self.logger.debug("ContID %s Had Been Crawled" % contId)
                         if contList:
                             for cont in contList:
                                 contId = cont.get('contId')
-                                await self.request_url(contId, session)
+                                if contId not in self.contIds_seen:
+                                    self.contIds_seen.add(contId)
+                                    await self.request_url(contId, session)
+                                else:
+                                    self.logger.debug("ContID %s Had Been Crawled" % contId)
                         nextUrl = text_json.get('nextUrl')
                         if nextUrl:
                             await self.get_contId(nextUrl, session)
