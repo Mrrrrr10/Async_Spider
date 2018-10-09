@@ -87,9 +87,9 @@ class Spider(object):
                             video_size = [video.get('fileSize') for video in videos if video.get('url') == video_url][0]
                             if video_url and video_name and video_size:
                                 if video_url.endswith(".mp4"):
-                                    if "|" or '"' or "." in video_name:
-                                        video_name = video_name.replace("|", '').replace('"', '')
-                                        await self.video_download(video_url, video_name, int(video_size), session)
+                                    video_name = video_name.replace("|", '').replace('"', '').replace("？", '')\
+                                        .replace(".", '').replace('\\', '').replace('/', '').replace("<", '').replace('>', '')
+                                    await self.video_download(video_url, video_name, int(video_size), session)
                 except Exception as e:
                     self.logger.debug(e)
 
